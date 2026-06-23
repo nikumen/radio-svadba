@@ -146,13 +146,15 @@ window.addEventListener("beforeunload", snapshot);
     player.autoExtend = shared.wave ? () => waveBatch(6) : null;
     player.setQueue(shared.tracks, shared.index, { play: false, name: shared.name });
     toast("Плейлист по ссылке: " + shared.name, "accent");
-  } else {
-    const saved = store.get("lastState", null);
-    if (saved && saved.tracks && saved.tracks.length) {
-      player.queueName = saved.name || "";
-      if (saved.time) player.audio.addEventListener("loadedmetadata", function once() { try { player.audio.currentTime = saved.time; } catch {} player.audio.removeEventListener("loadedmetadata", once); });
-      player.setQueue(saved.tracks, saved.idx || 0, { play: false, name: saved.name || "" });
-    }
+    if (shared.id) views.openPlaylist(shared.id);   // именованный плейлист → открыть его экран
+    else views.show("home");
+    return;
+  }
+  const saved = store.get("lastState", null);
+  if (saved && saved.tracks && saved.tracks.length) {
+    player.queueName = saved.name || "";
+    if (saved.time) player.audio.addEventListener("loadedmetadata", function once() { try { player.audio.currentTime = saved.time; } catch {} player.audio.removeEventListener("loadedmetadata", once); });
+    player.setQueue(saved.tracks, saved.idx || 0, { play: false, name: saved.name || "" });
   }
   views.show("home");
 })();

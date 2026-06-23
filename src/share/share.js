@@ -30,7 +30,7 @@ export function parseShareLink() {
   const plMatch = hash.match(/(?:^|&)pl=([\w-]+)/);
   if (plMatch) {
     const pl = getPlaylist(plMatch[1]);
-    if (pl) return { tracks: playlistTracks(pl.id), index: 0, name: pl.title, wave: !!pl.wave };
+    if (pl) return { id: pl.id, tracks: playlistTracks(pl.id), index: 0, name: pl.title, wave: !!pl.wave };
   }
   const pMatch = hash.match(/(?:^|&)p=([^&]+)/);
   if (pMatch) {
