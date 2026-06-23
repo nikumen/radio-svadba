@@ -22,8 +22,9 @@ export const TRACKS = [
   { id: "s16", title: "Daybreak",        artist: "Lena Wilde",  src: src(16), duration: 294 },
 ];
 
-// Live wedding sets — original 320 kbps, hosted on GitHub Releases (no recompress).
-const REL = "https://github.com/nikumen/radio-svadba/releases/download/audio-v1/";
+// Live wedding sets — original 320 kbps, self-hosted on Beget VPS (allmusicbot.ru,
+// RU-доступно без VPN, постоянная ссылка, range/seek, CORS). Не пережато.
+const REL = "https://allmusicbot.ru/audio/";
 export const WEDDING = [
   { id: "w1", title: "ЗАГС — Салоне", artist: "Радио Свадьба", src: REL + "radio-zags-salone.mp3",  duration: 1638 },
   { id: "w2", title: "Салоне — Яхта", artist: "Радио Свадьба", src: REL + "radio-salone-yahta.mp3", duration: 3641 },
