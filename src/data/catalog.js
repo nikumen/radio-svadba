@@ -22,11 +22,19 @@ export const TRACKS = [
   { id: "s16", title: "Daybreak",        artist: "Lena Wilde",  src: src(16), duration: 294 },
 ];
 
-const byId = new Map(TRACKS.map((t) => [t.id, t]));
+// Live wedding sets — original 320 kbps, hosted on GitHub Releases (no recompress).
+const REL = "https://github.com/nikumen/volna-player/releases/download/audio-v1/";
+export const WEDDING = [
+  { id: "w1", title: "ЗАГС — Салоне", artist: "Радио Свадьба", src: REL + "radio-zags-salone.mp3",  duration: 1638 },
+  { id: "w2", title: "Салоне — Яхта", artist: "Радио Свадьба", src: REL + "radio-salone-yahta.mp3", duration: 3641 },
+];
+
+const byId = new Map([...TRACKS, ...WEDDING].map((t) => [t.id, t]));
 export const getTrack = (id) => byId.get(id) || null;
 
 export const PLAYLISTS = [
-  { id: "wave",    title: "Моя волна",      subtitle: "Бесконечный поток",        wave: true, trackIds: TRACKS.map((t) => t.id) },
+  { id: "wave",    title: "Моя волна",      subtitle: "Бесконечный поток",         wave: true, trackIds: TRACKS.map((t) => t.id) },
+  { id: "wedding", title: "РАДИО СВАДЬБА",  subtitle: "Живой сет · оригинал 320k", tracks: WEDDING },
   { id: "night",   title: "Ночная езда",    subtitle: "Тёмный синт и драйв",      trackIds: ["s1", "s7", "s12", "s15", "s10", "s5"] },
   { id: "focus",   title: "Глубокий фокус", subtitle: "Спокойствие и поток",      trackIds: ["s3", "s9", "s11", "s6", "s2", "s8"] },
   { id: "sunrise", title: "Рассвет",        subtitle: "Тёплое и светлое",         trackIds: ["s4", "s8", "s16", "s13", "s11"] },
@@ -35,8 +43,12 @@ export const PLAYLISTS = [
 
 const plById = new Map(PLAYLISTS.map((p) => [p.id, p]));
 export const getPlaylist = (id) => plById.get(id) || null;
-export const playlistTracks = (id) =>
-  (plById.get(id)?.trackIds || []).map(getTrack).filter(Boolean);
+export const playlistTracks = (id) => {
+  const pl = plById.get(id);
+  if (!pl) return [];
+  if (pl.tracks) return pl.tracks;       // playlist carries its own tracks (e.g. РАДИО СВАДЬБА)
+  return (pl.trackIds || []).map(getTrack).filter(Boolean);
+};
 
 /** shuffled batch from the whole catalog — fuels the auto-extending «Моя волна» */
 export function waveBatch(n = 8) {

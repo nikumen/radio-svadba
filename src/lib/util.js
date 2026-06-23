@@ -28,8 +28,10 @@ export const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
 export function fmtTime(s) {
   if (!isFinite(s) || s < 0) return "0:00";
   s = Math.floor(s);
-  const m = Math.floor(s / 60);
-  return `${m}:${String(s % 60).padStart(2, "0")}`;
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const ss = String(s % 60).padStart(2, "0");
+  return h > 0 ? `${h}:${String(m).padStart(2, "0")}:${ss}` : `${m}:${ss}`;
 }
 
 /* ── seeded RNG ── */
