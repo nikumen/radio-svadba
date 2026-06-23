@@ -1,0 +1,76 @@
+/* VOLNA — design tokens. SoundCloud-warm light, Yandex-comfort layout. */
+:root {
+  /* brand */
+  --accent: #ff5500;            /* SoundCloud orange */
+  --accent-strong: #f23d00;
+  --accent-soft: #ff7a40;
+  --accent-tint: oklch(0.67 0.21 41 / 0.12);
+  --accent-tint-2: oklch(0.67 0.21 41 / 0.18);
+
+  /* warm-tinted neutrals (light) */
+  --bg: oklch(0.982 0.006 70);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.965 0.008 72);
+  --surface-3: oklch(0.94 0.01 72);
+  --line: oklch(0.9 0.01 72);
+  --line-soft: oklch(0.93 0.008 72);
+
+  --text: oklch(0.26 0.02 55);
+  --text-2: oklch(0.47 0.02 58);
+  --text-3: oklch(0.62 0.016 62);
+
+  --wave-bg: oklch(0.83 0.016 65);
+  --wave-bg-hi: oklch(0.78 0.02 60);
+  --wave-fg: var(--accent);
+  --wave-fg-hi: var(--accent-strong);
+
+  --shadow-sm: 0 1px 2px oklch(0.3 0.03 60 / 0.06), 0 2px 6px oklch(0.3 0.03 60 / 0.05);
+  --shadow: 0 1px 2px oklch(0.3 0.03 60 / 0.06), 0 10px 34px oklch(0.3 0.03 60 / 0.1);
+  --shadow-lg: 0 18px 60px oklch(0.3 0.04 50 / 0.18);
+
+  /* type */
+  --font-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --font-body: "Golos Text", system-ui, -apple-system, sans-serif;
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-base: 0.9375rem;
+  --t-md: 1.0625rem;
+  --t-lg: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+  --t-xl: clamp(1.6rem, 1.1rem + 2vw, 2.25rem);
+  --t-display: clamp(2.4rem, 1.2rem + 5vw, 4.25rem);
+
+  /* space + shape */
+  --s1: 0.25rem; --s2: 0.5rem; --s3: 0.75rem; --s4: 1rem;
+  --s5: 1.5rem; --s6: 2rem; --s7: 3rem; --s8: 4.5rem;
+  --radius: 14px; --radius-sm: 10px; --radius-lg: 22px; --pill: 999px;
+
+  --sidebar-w: 252px;
+  --queue-w: 332px;
+  --player-h: 92px;
+
+  --dur-fast: 140ms;
+  --dur: 260ms;
+  --dur-slow: 520ms;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);    /* ease-out-quint-ish */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+[data-theme="dark"] {
+  --bg: oklch(0.17 0.012 60);
+  --surface: oklch(0.215 0.014 60);
+  --surface-2: oklch(0.255 0.015 60);
+  --surface-3: oklch(0.3 0.016 60);
+  --line: oklch(0.32 0.015 60);
+  --line-soft: oklch(0.28 0.013 60);
+
+  --text: oklch(0.95 0.012 75);
+  --text-2: oklch(0.74 0.016 68);
+  --text-3: oklch(0.58 0.016 64);
+
+  --wave-bg: oklch(0.4 0.02 62);
+  --wave-bg-hi: oklch(0.47 0.025 60);
+
+  --shadow-sm: 0 1px 2px #0007;
+  --shadow: 0 2px 4px #0006, 0 14px 44px #00000066;
+  --shadow-lg: 0 24px 70px #000000aa;
+}

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ff5500" />
+  <title>VOLNA — музыка без границ</title>
+  <meta name="description" content="VOLNA — онлайн-плеер, который работает везде без VPN. Плейлисты, ссылки, Bluetooth." />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ff5500'/%3E%3Cg fill='%23fff'%3E%3Crect x='6' y='14' width='2.4' height='4' rx='1.2'/%3E%3Crect x='10' y='10' width='2.4' height='12' rx='1.2'/%3E%3Crect x='14' y='6' width='2.4' height='20' rx='1.2'/%3E%3Crect x='18' y='11' width='2.4' height='10' rx='1.2'/%3E%3Crect x='22' y='13' width='2.4' height='6' rx='1.2'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;800&display=swap" />
+
+  <link rel="stylesheet" href="./styles/tokens.css" />
+  <link rel="stylesheet" href="./styles/base.css" />
+  <link rel="stylesheet" href="./styles/layout.css" />
+  <link rel="stylesheet" href="./styles/components.css" />
+  <link rel="stylesheet" href="./styles/player.css" />
+  <link rel="stylesheet" href="./styles/responsive.css" />
+</head>
+<body>
+  <a class="skip-link" href="#view">К содержимому</a>
+
+  <div class="app">
+    <!-- ░░ SIDEBAR ░░ -->
+    <aside class="sidebar" id="sidebar" aria-label="Навигация">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 36 36" width="34" height="34"><rect width="36" height="36" rx="10" fill="var(--accent)"/><g fill="#fff"><rect x="7" y="16" width="2.6" height="4" rx="1.3"/><rect x="11.5" y="11" width="2.6" height="14" rx="1.3"/><rect x="16" y="6" width="2.6" height="24" rx="1.3"/><rect x="20.5" y="12" width="2.6" height="12" rx="1.3"/><rect x="25" y="15" width="2.6" height="6" rx="1.3"/></g></svg>
+        </span>
+        <span class="brand__name">VOLNA</span>
+      </div>
+
+      <nav class="nav" aria-label="Разделы">
+        <button class="nav__item is-active" data-view="home" type="button"><span class="nav__ico">⌂</span>Главная</button>
+        <button class="nav__item" data-view="wave" type="button"><span class="nav__ico">≈</span>Моя волна</button>
+        <button class="nav__item" data-view="playlists" type="button"><span class="nav__ico">≣</span>Плейлисты</button>
+        <button class="nav__item" data-view="liked" type="button"><span class="nav__ico">♥</span>Любимое</button>
+      </nav>
+
+      <div class="sidebar__section">
+        <p class="sidebar__label">Плейлисты</p>
+        <div class="sidebar__playlists" id="side-playlists"><!-- rendered --></div>
+      </div>
+
+      <div class="sidebar__foot">
+        <span class="globe" aria-hidden="true">🌍</span>
+        <span>Работает везде<br>без VPN</span>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim" hidden></div>
+
+    <!-- ░░ MAIN ░░ -->
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn topbar__menu" id="btn-menu" type="button" aria-label="Меню">☰</button>
+        <div class="search">
+          <span class="search__ico" aria-hidden="true">⌕</span>
+          <input id="search" type="search" placeholder="Поиск трека или исполнителя…" aria-label="Поиск" autocomplete="off" />
+        </div>
+        <div class="topbar__actions">
+          <button class="ghost-btn" id="btn-add" type="button">+ Трек по ссылке</button>
+          <button class="icon-btn" id="btn-theme" type="button" aria-label="Сменить тему" title="Тема">◐</button>
+        </div>
+      </header>
+
+      <section class="view" id="view" tabindex="-1"><!-- rendered --></section>
+    </main>
+
+    <!-- ░░ QUEUE DRAWER ░░ -->
+    <aside class="queue" id="queue" aria-label="Очередь" hidden>
+      <div class="queue__head">
+        <h2>Очередь</h2>
+        <button class="icon-btn" id="queue-close" type="button" aria-label="Закрыть очередь">×</button>
+      </div>
+      <ol class="queue__list" id="queue-list"></ol>
+    </aside>
+  </div>
+
+  <!-- ░░ PLAYER BAR ░░ -->
+  <footer class="playerbar" id="playerbar" aria-label="Плеер">
+    <div class="pb__track">
+      <button class="pb__art" id="pb-art" type="button" aria-label="Развернуть плеер" title="Развернуть"></button>
+      <div class="pb__meta">
+        <span class="pb__title" id="pb-title">Готов к воспроизведению</span>
+        <span class="pb__artist" id="pb-artist">Выберите трек</span>
+      </div>
+      <button class="iconbtn pb__like" id="pb-like" type="button" aria-label="В любимые" aria-pressed="false">♥</button>
+    </div>
+
+    <div class="pb__center">
+      <div class="pb__controls">
+        <button class="iconbtn" id="pb-shuffle" type="button" aria-label="Перемешать" aria-pressed="false">⤮</button>
+        <button class="iconbtn" id="pb-prev" type="button" aria-label="Предыдущий">⏮</button>
+        <button class="iconbtn pb__play" id="pb-play" type="button" aria-label="Воспроизвести">▶</button>
+        <button class="iconbtn" id="pb-next" type="button" aria-label="Следующий">⏭</button>
+        <button class="iconbtn" id="pb-repeat" type="button" aria-label="Повтор" data-mode="off">↻</button>
+      </div>
+      <div class="pb__seek">
+        <span class="pb__time" id="pb-cur">0:00</span>
+        <div class="pb__wave" id="pb-wave-wrap" role="slider" aria-label="Перемотка" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+          <canvas id="pb-wave"></canvas>
+        </div>
+        <span class="pb__time" id="pb-dur">0:00</span>
+      </div>
+    </div>
+
+    <div class="pb__right">
+      <button class="iconbtn" id="pb-output" type="button" aria-label="Устройство вывода / Bluetooth" title="Bluetooth / устройство вывода">🎧<span class="pb__output-dot" id="pb-output-dot" hidden></span></button>
+      <div class="pb__vol">
+        <button class="iconbtn" id="pb-mute" type="button" aria-label="Звук">🔊</button>
+        <input id="pb-vol" type="range" min="0" max="1" step="0.01" value="1" aria-label="Громкость" />
+      </div>
+      <button class="iconbtn" id="pb-share" type="button" aria-label="Поделиться плейлистом" title="Поделиться">↗</button>
+      <button class="iconbtn" id="pb-queue" type="button" aria-label="Очередь" aria-pressed="false">≣</button>
+    </div>
+  </footer>
+
+  <!-- ░░ NOW PLAYING (expanded) ░░ -->
+  <div class="np" id="np" hidden aria-label="Сейчас играет">
+    <button class="icon-btn np__close" id="np-close" type="button" aria-label="Свернуть">⌄</button>
+    <div class="np__art" id="np-art"></div>
+    <div class="np__info">
+      <p class="np__from" id="np-from">VOLNA</p>
+      <h1 class="np__title" id="np-title">—</h1>
+      <p class="np__artist" id="np-artist">—</p>
+    </div>
+    <div class="np__wave" id="np-wave-wrap" role="slider" aria-label="Перемотка" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+      <canvas id="np-wave"></canvas>
+    </div>
+    <div class="np__time"><span id="np-cur">0:00</span><span id="np-dur">0:00</span></div>
+    <div class="np__controls">
+      <button class="iconbtn" id="np-shuffle" type="button" aria-label="Перемешать">⤮</button>
+      <button class="iconbtn" id="np-prev" type="button" aria-label="Предыдущий">⏮</button>
+      <button class="iconbtn np__play" id="np-play" type="button" aria-label="Воспроизвести">▶</button>
+      <button class="iconbtn" id="np-next" type="button" aria-label="Следующий">⏭</button>
+      <button class="iconbtn" id="np-repeat" type="button" aria-label="Повтор" data-mode="off">↻</button>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <noscript><p style="padding:2rem;font-family:sans-serif">Для работы плеера нужен включённый JavaScript.</p></noscript>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

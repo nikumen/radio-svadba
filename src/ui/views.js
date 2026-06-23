@@ -1,0 +1,216 @@
+// VOLNA views: home, playlists, playlist detail, liked, search.
+import { TRACKS, PLAYLISTS, getTrack, getPlaylist, playlistTracks, waveBatch } from "../data/catalog.js";
+import { h, $, $$, fmtTime, artworkCss, genWaveform } from "../lib/util.js";
+import { likes } from "../lib/likes.js";
+import { shareUrl, playlistShareUrl } from "../share/share.js";
+
+export function mountViews(player, { play }) {
+  const view = $("view");
+  let current = "home", query = "";
+
+  /* ── small builders ── */
+  const eqEl = () => h("span", { class: "eq", "aria-hidden": "true" }, h("i"), h("i"), h("i"));
+
+  function waveSvg(seed, n = 64) {
+    const bars = genWaveform(seed, n);
+    const NS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "0 0 100 30");
+    svg.setAttribute("preserveAspectRatio", "none");
+    svg.setAttribute("class", "trow__wave");
+    svg.style.color = "var(--wave-bg)";
+    const bw = (100 / n) * 0.6;
+    for (let i = 0; i < n; i++) {
+      const hh = Math.max(1, bars[i] * 28);
+      const r = document.createElementNS(NS, "rect");
+      r.setAttribute("x", ((i / n) * 100).toFixed(2));
+      r.setAttribute("y", ((30 - hh) / 2).toFixed(2));
+      r.setAttribute("width", bw.toFixed(2));
+      r.setAttribute("height", hh.toFixed(2));
+      r.setAttribute("rx", "0.6");
+      r.setAttribute("fill", "currentColor");
+      svg.appendChild(r);
+    }
+    return svg;
+  }
+
+  function likeBtn(track) {
+    const b = h("span", {
+      class: "trow__like" + (likes.has(track.id) ? " is-liked" : ""),
+      role: "button", tabindex: "0", "aria-label": "В любимые", title: "В любимые",
+      onclick: (e) => { e.stopPropagation(); b.classList.toggle("is-liked", likes.toggle(track.id)); },
+      onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); b.classList.toggle("is-liked", likes.toggle(track.id)); } },
+    }, "♥");
+    return b;
+  }
+
+  function trackRow(track, idx, tracks, name, wave) {
+    return h("div", {
+      class: "trow", role: "button", tabindex: "0",
+      dataset: { trackId: track.id }, style: { "--i": idx },
+      onclick: () => play(tracks, idx, name, { wave }),
+      onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); play(tracks, idx, name, { wave }); } },
+    },
+      h("span", { class: "trow__idx" },
+        h("span", { class: "num" }, String(idx + 1)),
+        h("span", { class: "play" }, "▶"),
+        eqEl()),
+      h("span", { class: "trow__art", style: { background: artworkCss(track.id) } }),
+      h("span", { class: "trow__main" },
+        h("span", { class: "trow__title" }, track.title),
+        h("span", { class: "trow__artist" }, track.artist)),
+      waveSvg(track.id),
+      h("span", { class: "trow__right" },
+        likeBtn(track),
+        h("span", { class: "trow__dur", dataset: { durFor: track.id } }, track.duration ? fmtTime(track.duration) : "–:–"))
+    );
+  }
+
+  const tracklist = (tracks, name, wave = false) =>
+    h("div", { class: "tracklist" }, ...tracks.map((t, i) => trackRow(t, i, tracks, name, wave)));
+
+  function section(title, content, more) {
+    return h("section", { class: "section" },
+      h("div", { class: "section__head" }, h("h2", {}, title), more ? h("span", { class: "section__more" }, more) : null),
+      content);
+  }
+
+  function plCard(pl) {
+    const tracks = playlistTracks(pl.id);
+    return h("div", {
+      class: "pcard", role: "button", tabindex: "0",
+      onclick: () => openPlaylist(pl.id),
+      onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPlaylist(pl.id); } },
+    },
+      h("div", { class: "pcard__art", style: { background: artworkCss(pl.id) } },
+        h("button", {
+          class: "pcard__play", type: "button", "aria-label": "Слушать " + pl.title,
+          onclick: (e) => { e.stopPropagation(); play(pl.wave ? waveBatch(12) : tracks, 0, pl.title, { wave: !!pl.wave }); },
+        }, "▶")),
+      h("div", {},
+        h("div", { class: "pcard__title" }, pl.title),
+        h("div", { class: "pcard__sub" }, pl.subtitle))
+    );
+  }
+
+  /* ── views ── */
+  function viewHome() {
+    const frag = h("div", {});
+    frag.append(
+      h("section", { class: "hero" },
+        h("div", { class: "hero__bars", "aria-hidden": "true" },
+          ...Array.from({ length: 7 }, () => h("span", { style: { animationDelay: (Math.random() * -1.4).toFixed(2) + "s" } }))),
+        h("p", { class: "hero__eyebrow" }, "Моя волна"),
+        h("h1", { class: "hero__title" }, "Бесконечный поток"),
+        h("p", { class: "hero__sub" }, "Персональная волна, которая играет без остановки. Доступно отовсюду — без VPN, без аккаунта."),
+        h("div", { class: "hero__actions" },
+          h("button", { class: "pill-btn", type: "button", onclick: () => play(waveBatch(12), 0, "Моя волна", { wave: true }) }, "▶  Слушать волну"),
+          h("button", { class: "pill-btn pill-btn--ghost", type: "button", onclick: () => $("pb-share").click() }, "↗  Поделиться"))
+      ),
+      section("Плейлисты", h("div", { class: "rail" }, ...PLAYLISTS.map(plCard))),
+      section("Все треки", tracklist(TRACKS, "Все треки"), `${TRACKS.length} треков`)
+    );
+    return frag;
+  }
+
+  function viewPlaylists() {
+    return h("div", {}, section("Все плейлисты",
+      h("div", { style: { display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fill, minmax(168px, 1fr))" } },
+        ...PLAYLISTS.map(plCard))));
+  }
+
+  function viewPlaylist(id) {
+    const pl = getPlaylist(id);
+    if (!pl) return viewHome();
+    const tracks = playlistTracks(id);
+    return h("div", {},
+      h("div", { class: "section", style: { display: "flex", gap: "1.25rem", alignItems: "flex-end", flexWrap: "wrap" } },
+        h("div", { style: { width: "150px", height: "150px", borderRadius: "18px", background: artworkCss(pl.id), boxShadow: "var(--shadow)", flex: "none" } }),
+        h("div", {},
+          h("p", { class: "hero__eyebrow", style: { color: "var(--text-3)" } }, "Плейлист"),
+          h("h1", { style: { fontSize: "var(--t-xl)" } }, pl.title),
+          h("p", { style: { color: "var(--text-2)" } }, `${pl.subtitle} · ${tracks.length} треков`),
+          h("div", { class: "hero__actions", style: { marginTop: "1rem" } },
+            h("button", { class: "pill-btn", type: "button", onclick: () => play(pl.wave ? waveBatch(12) : tracks, 0, pl.title, { wave: !!pl.wave }) }, "▶  Слушать"),
+            h("button", { class: "pill-btn pill-btn--ghost", type: "button", onclick: () => shareUrl(playlistShareUrl(id), pl.title) }, "↗  Поделиться")))),
+      h("div", { class: "section" }, tracklist(tracks, pl.title, !!pl.wave))
+    );
+  }
+
+  function viewLiked() {
+    const tracks = likes.list().map(getTrack).filter(Boolean);
+    if (!tracks.length)
+      return emptyState("♥", "Пока пусто", "Нажимайте на сердечко у треков — они появятся здесь.");
+    return h("div", {}, section("Любимое", tracklist(tracks, "Любимое"), `${tracks.length}`));
+  }
+
+  function viewWave() {
+    const frag = h("div", {});
+    frag.append(
+      h("section", { class: "hero" },
+        h("div", { class: "hero__bars", "aria-hidden": "true" },
+          ...Array.from({ length: 7 }, () => h("span", { style: { animationDelay: (Math.random() * -1.4).toFixed(2) + "s" } }))),
+        h("p", { class: "hero__eyebrow" }, "Моя волна"),
+        h("h1", { class: "hero__title" }, "Бесконечный поток"),
+        h("p", { class: "hero__sub" }, "Запустите волну — треки будут добавляться сами, пока вы слушаете."),
+        h("div", { class: "hero__actions" },
+          h("button", { class: "pill-btn", type: "button", onclick: () => play(waveBatch(12), 0, "Моя волна", { wave: true }) }, "▶  Запустить волну"))),
+      section("В потоке", tracklist(TRACKS, "Моя волна", true))
+    );
+    return frag;
+  }
+
+  function viewSearch(q) {
+    const lq = q.toLowerCase();
+    const res = TRACKS.filter((t) => t.title.toLowerCase().includes(lq) || t.artist.toLowerCase().includes(lq));
+    if (!res.length) return emptyState("⌕", "Ничего не нашлось", `По запросу «${q}» нет треков. Можно добавить трек по ссылке.`);
+    return h("div", {}, section(`Результаты: «${q}»`, tracklist(res, "Поиск"), `${res.length}`));
+  }
+
+  const emptyState = (emoji, title, text) =>
+    h("div", { class: "empty" }, h("div", { class: "empty__emoji" }, emoji), h("h3", {}, title), h("p", {}, text));
+
+  /* ── controller ── */
+  function setNavActive(v) { $$(".nav__item").forEach((b) => b.classList.toggle("is-active", b.dataset.view === v)); }
+
+  function paint() {
+    view.innerHTML = "";
+    if (current === "search") view.append(viewSearch(query));
+    else if (current === "playlists") view.append(viewPlaylists());
+    else if (current === "liked") view.append(viewLiked());
+    else if (current === "wave") view.append(viewWave());
+    else if (current.startsWith("pl:")) view.append(viewPlaylist(current.slice(3)));
+    else view.append(viewHome());
+    updateCurrent(player.current());
+  }
+
+  function show(v) {
+    current = v; query = "";
+    setNavActive(v === "wave" ? "wave" : v);
+    paint(); view.scrollTop = 0;
+  }
+  function openPlaylist(id) {
+    current = "pl:" + id; query = "";
+    setNavActive("playlists"); paint(); view.scrollTop = 0;
+  }
+  function search(q) {
+    query = q.trim();
+    current = query ? "search" : "home";
+    setNavActive("home"); paint();
+  }
+  function updateCurrent(track) {
+    const id = track && track.id;
+    $$(".trow", view).forEach((r) => r.classList.toggle("is-current", r.dataset.trackId === id));
+  }
+  function updateDur() {
+    const t = player.current();
+    if (!t || !t.duration) return;
+    $$(`[data-dur-for="${t.id}"]`, view).forEach((el) => (el.textContent = fmtTime(t.duration)));
+  }
+
+  player.addEventListener("trackchange", (e) => updateCurrent(e.detail));
+  player.addEventListener("meta", updateDur);
+  likes.onChange(() => { if (current === "liked") paint(); });
+
+  return { show, search, paint, openPlaylist };
+}
