@@ -82,16 +82,18 @@ export function mountViews(player, { play }) {
 
   function plCard(pl) {
     const tracks = playlistTracks(pl.id);
+    const art = h("div", { class: "pcard__art" },
+      h("button", {
+        class: "pcard__play", type: "button", "aria-label": "Слушать " + pl.title, html: ICONS.play,
+        onclick: (e) => { e.stopPropagation(); play(tracks, 0, pl.title); },
+      }));
+    applyCover(art, pl);
     return h("div", {
       class: "pcard", role: "button", tabindex: "0",
       onclick: () => openPlaylist(pl.id),
       onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPlaylist(pl.id); } },
     },
-      h("div", { class: "pcard__art", style: { background: artworkCss(pl.id) } },
-        h("button", {
-          class: "pcard__play", type: "button", "aria-label": "Слушать " + pl.title, html: ICONS.play,
-          onclick: (e) => { e.stopPropagation(); play(tracks, 0, pl.title); },
-        })),
+      art,
       h("div", {},
         h("div", { class: "pcard__title" }, pl.title),
         h("div", { class: "pcard__sub" }, pl.subtitle))
@@ -111,9 +113,11 @@ export function mountViews(player, { play }) {
     const pl = getPlaylist(id);
     if (!pl) return emptyState("search", "Плейлист не найден", "");
     const tracks = playlistTracks(id);
+    const art = h("div", { class: "pl-cover", style: { width: "150px", height: "150px", borderRadius: "18px", boxShadow: "var(--shadow)", flex: "none" } });
+    applyCover(art, pl);
     return h("div", {},
       h("div", { class: "section", style: { display: "flex", gap: "1.25rem", alignItems: "flex-end", flexWrap: "wrap" } },
-        h("div", { style: { width: "150px", height: "150px", borderRadius: "18px", background: artworkCss(pl.id), boxShadow: "var(--shadow)", flex: "none" } }),
+        art,
         h("div", {},
           h("p", { class: "hero__eyebrow", style: { color: "var(--text-3)" } }, "Плейлист"),
           h("h1", { style: { fontSize: "var(--t-xl)" } }, pl.title),

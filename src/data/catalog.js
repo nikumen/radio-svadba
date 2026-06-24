@@ -17,7 +17,7 @@ const byId = new Map([...TRACKS, ...WEDDING].map((t) => [t.id, t]));
 export const getTrack = (id) => byId.get(id) || null;
 
 export const PLAYLISTS = [
-  { id: "wedding", title: "РАДИО СВАДЬБА", subtitle: "Живой сет · оригинал 320k", tracks: WEDDING },
+  { id: "wedding", title: "РАДИО СВАДЬБА", subtitle: "Живой сет · оригинал 320k", tracks: WEDDING, logo: LOGO },
 ];
 
 const plById = new Map(PLAYLISTS.map((p) => [p.id, p]));
