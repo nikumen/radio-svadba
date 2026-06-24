@@ -1,0 +1,14 @@
+{
+  "name": "VOLNA — Радио Свадьба",
+  "short_name": "VOLNA",
+  "description": "Свадебное радио — играет везде без VPN, в фоне и при блокировке.",
+  "start_url": "./#pl=wedding",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#faf9f7",
+  "theme_color": "#ff5500",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

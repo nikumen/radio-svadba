@@ -7,6 +7,11 @@ class Player extends EventTarget {
     super();
     this.audio = new Audio();
     this.audio.preload = "metadata";
+    this.audio.setAttribute("playsinline", "");
+    // Держим элемент в DOM — иначе мобильные браузеры глушат фоновое
+    // воспроизведение при сворачивании/блокировке экрана.
+    const mount = () => { try { document.body.appendChild(this.audio); } catch {} };
+    if (typeof document !== "undefined") (document.body ? mount() : document.addEventListener("DOMContentLoaded", mount, { once: true }));
     this.queue = [];        // track objects
     this.order = [];        // indices into queue (playback order)
     this.pos = -1;          // index into order
