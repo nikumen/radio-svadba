@@ -1,6 +1,6 @@
 // VOLNA views: home, playlists, playlist detail, liked, search.
 import { TRACKS, PLAYLISTS, getTrack, getPlaylist, playlistTracks, waveBatch } from "../data/catalog.js";
-import { h, $, $$, fmtTime, artworkCss, genWaveform } from "../lib/util.js";
+import { h, $, $$, fmtTime, artworkCss, genWaveform, applyCover } from "../lib/util.js";
 import { likes } from "../lib/likes.js";
 import { shareUrl, playlistShareUrl } from "../share/share.js";
 import { ICONS } from "../lib/icons.js";
@@ -11,6 +11,7 @@ export function mountViews(player, { play }) {
 
   /* ── small builders ── */
   const eqEl = () => h("span", { class: "eq", "aria-hidden": "true" }, h("i"), h("i"), h("i"));
+  const cover = (track, cls) => { const e = h("span", { class: cls }); applyCover(e, track); return e; };
 
   function waveSvg(seed, n = 64) {
     const bars = genWaveform(seed, n);
@@ -59,7 +60,7 @@ export function mountViews(player, { play }) {
         h("span", { class: "num" }, String(idx + 1)),
         h("span", { class: "play", html: ICONS.play }),
         eqEl()),
-      h("span", { class: "trow__art", style: { background: artworkCss(track.id) } }),
+      cover(track, "trow__art"),
       h("span", { class: "trow__main" },
         h("span", { class: "trow__title" }, track.title),
         h("span", { class: "trow__artist" }, track.artist)),

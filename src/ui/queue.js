@@ -1,5 +1,5 @@
 // Queue drawer — shows the upcoming play order, click to jump, × to remove.
-import { h, $, $$, artworkCss } from "../lib/util.js";
+import { h, $, $$, artworkCss, applyCover } from "../lib/util.js";
 import { ICONS } from "../lib/icons.js";
 
 export function initQueue(player) {
@@ -26,6 +26,8 @@ export function initQueue(player) {
     player.order.forEach((qi, p) => {
       const t = player.queue[qi];
       if (!t) return;
+      const art = h("span", { class: "qrow__art" });
+      applyCover(art, t);
       const row = h("li", {},
         h("div", {
           class: "qrow" + (p === player.pos ? " is-current" : ""),
@@ -33,7 +35,7 @@ export function initQueue(player) {
           onclick: () => player.playPos(p),
           onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); player.playPos(p); } },
         },
-          h("span", { class: "qrow__art", style: { background: artworkCss(t.id) } }),
+          art,
           h("span", { style: { minWidth: 0 } },
             h("div", { class: "qrow__t" }, t.title),
             h("div", { class: "qrow__a" }, t.artist)),

@@ -25,9 +25,10 @@ export const TRACKS = [
 // Live wedding sets — original 320 kbps, self-hosted on Beget VPS (allmusicbot.ru,
 // RU-доступно без VPN, постоянная ссылка, range/seek, CORS). Не пережато.
 const REL = "https://allmusicbot.ru/audio/";
+const LOGO = "assets/feerique-logo.svg"; // Feerique Event — бренд на обложках свадебных треков
 export const WEDDING = [
-  { id: "w1", title: "ЗАГС — Салоне", artist: "Радио Свадьба", src: REL + "radio-zags-salone.mp3",  duration: 1638 },
-  { id: "w2", title: "Салоне — Яхта", artist: "Радио Свадьба", src: REL + "radio-salone-yahta.mp3", duration: 3641 },
+  { id: "w1", title: "ЗАГС — Салоне", artist: "Радио Свадьба", src: REL + "radio-zags-salone.mp3",  duration: 1638, logo: LOGO },
+  { id: "w2", title: "Салоне — Яхта", artist: "Радио Свадьба", src: REL + "radio-salone-yahta.mp3", duration: 3641, logo: LOGO },
 ];
 
 const byId = new Map([...TRACKS, ...WEDDING].map((t) => [t.id, t]));

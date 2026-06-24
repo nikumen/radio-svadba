@@ -1,7 +1,7 @@
 // Wires the persistent bottom bar + the expanded Now-Playing overlay.
 import { createWaveform } from "./waveform.js";
 import { toast } from "./toast.js";
-import { $, fmtTime, artworkCss, artHue } from "../lib/util.js";
+import { $, fmtTime, artworkCss, artHue, applyCover } from "../lib/util.js";
 import { likes } from "../lib/likes.js";
 import { setIcon } from "../lib/icons.js";
 
@@ -70,11 +70,11 @@ export function initPlayerBar(player) {
     const t = e.detail; if (!t) return;
     $("pb-title").textContent = t.title;
     $("pb-artist").textContent = t.artist;
-    $("pb-art").style.background = artworkCss(t.id);
+    applyCover($("pb-art"), t);
     $("np-title").textContent = t.title;
     $("np-artist").textContent = t.artist;
     $("np-from").textContent = player.queueName || "VOLNA";
-    $("np-art").style.background = artworkCss(t.id);
+    applyCover($("np-art"), t);
     const hue = artHue(t.id);
     np.style.setProperty("--np-bg", `linear-gradient(160deg, hsl(${hue} 42% 14%), hsl(${(hue + 38) % 360} 46% 8%))`);
     np.style.setProperty("--np-glow", `radial-gradient(circle at 30% 18%, hsl(${hue} 90% 55% / .5), transparent 55%)`);

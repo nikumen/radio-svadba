@@ -79,6 +79,27 @@ export function artworkCss(seed) {
   const hue = artHue(seed), h2 = (hue + 38) % 360;
   return `linear-gradient(140deg, hsl(${hue} 86% 63%), hsl(${h2} 80% 45%))`;
 }
+
+/** paint a cover element: gradient + optional brand logo overlay (white silhouette via CSS mask) */
+export function applyCover(el, track) {
+  if (!el || !track) return;
+  el.style.background = artworkCss(track.id);
+  let logo = el.querySelector(":scope > .cover-logo");
+  if (track.logo) {
+    el.classList.add("cover--logo");
+    if (!logo) {
+      logo = document.createElement("img");
+      logo.className = "cover-logo";
+      logo.alt = "";
+      logo.setAttribute("aria-hidden", "true");
+      el.prepend(logo);
+    }
+    if (logo.getAttribute("src") !== track.logo) logo.setAttribute("src", track.logo);
+  } else {
+    el.classList.remove("cover--logo");
+    if (logo) logo.remove();
+  }
+}
 let _artCache = new Map();
 export function artworkDataUrl(seed, size = 512) {
   if (_artCache.has(seed)) return _artCache.get(seed);
