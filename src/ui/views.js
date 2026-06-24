@@ -3,6 +3,7 @@ import { TRACKS, PLAYLISTS, getTrack, getPlaylist, playlistTracks, waveBatch } f
 import { h, $, $$, fmtTime, artworkCss, genWaveform } from "../lib/util.js";
 import { likes } from "../lib/likes.js";
 import { shareUrl, playlistShareUrl } from "../share/share.js";
+import { ICONS } from "../lib/icons.js";
 
 export function mountViews(player, { play }) {
   const view = $("view");
@@ -35,12 +36,15 @@ export function mountViews(player, { play }) {
   }
 
   function likeBtn(track) {
+    const liked0 = likes.has(track.id);
+    const setLk = (on) => { b.classList.toggle("is-liked", on); b.innerHTML = ICONS[on ? "heartFilled" : "heart"]; };
     const b = h("span", {
-      class: "trow__like" + (likes.has(track.id) ? " is-liked" : ""),
+      class: "trow__like" + (liked0 ? " is-liked" : ""),
       role: "button", tabindex: "0", "aria-label": "В любимые", title: "В любимые",
-      onclick: (e) => { e.stopPropagation(); b.classList.toggle("is-liked", likes.toggle(track.id)); },
-      onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); b.classList.toggle("is-liked", likes.toggle(track.id)); } },
-    }, "♥");
+      html: ICONS[liked0 ? "heartFilled" : "heart"],
+      onclick: (e) => { e.stopPropagation(); setLk(likes.toggle(track.id)); },
+      onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); setLk(likes.toggle(track.id)); } },
+    });
     return b;
   }
 
@@ -53,7 +57,7 @@ export function mountViews(player, { play }) {
     },
       h("span", { class: "trow__idx" },
         h("span", { class: "num" }, String(idx + 1)),
-        h("span", { class: "play" }, "▶"),
+        h("span", { class: "play", html: ICONS.play }),
         eqEl()),
       h("span", { class: "trow__art", style: { background: artworkCss(track.id) } }),
       h("span", { class: "trow__main" },
@@ -84,9 +88,9 @@ export function mountViews(player, { play }) {
     },
       h("div", { class: "pcard__art", style: { background: artworkCss(pl.id) } },
         h("button", {
-          class: "pcard__play", type: "button", "aria-label": "Слушать " + pl.title,
+          class: "pcard__play", type: "button", "aria-label": "Слушать " + pl.title, html: ICONS.play,
           onclick: (e) => { e.stopPropagation(); play(pl.wave ? waveBatch(12) : tracks, 0, pl.title, { wave: !!pl.wave }); },
-        }, "▶")),
+        })),
       h("div", {},
         h("div", { class: "pcard__title" }, pl.title),
         h("div", { class: "pcard__sub" }, pl.subtitle))
@@ -140,7 +144,7 @@ export function mountViews(player, { play }) {
   function viewLiked() {
     const tracks = likes.list().map(getTrack).filter(Boolean);
     if (!tracks.length)
-      return emptyState("♥", "Пока пусто", "Нажимайте на сердечко у треков — они появятся здесь.");
+      return emptyState("heart", "Пока пусто", "Нажимайте на сердечко у треков — они появятся здесь.");
     return h("div", {}, section("Любимое", tracklist(tracks, "Любимое"), `${tracks.length}`));
   }
 
@@ -163,12 +167,12 @@ export function mountViews(player, { play }) {
   function viewSearch(q) {
     const lq = q.toLowerCase();
     const res = TRACKS.filter((t) => t.title.toLowerCase().includes(lq) || t.artist.toLowerCase().includes(lq));
-    if (!res.length) return emptyState("⌕", "Ничего не нашлось", `По запросу «${q}» нет треков. Можно добавить трек по ссылке.`);
+    if (!res.length) return emptyState("search", "Ничего не нашлось", `По запросу «${q}» нет треков. Можно добавить трек по ссылке.`);
     return h("div", {}, section(`Результаты: «${q}»`, tracklist(res, "Поиск"), `${res.length}`));
   }
 
-  const emptyState = (emoji, title, text) =>
-    h("div", { class: "empty" }, h("div", { class: "empty__emoji" }, emoji), h("h3", {}, title), h("p", {}, text));
+  const emptyState = (iconName, title, text) =>
+    h("div", { class: "empty" }, h("div", { class: "empty__ico", html: ICONS[iconName] || "" }), h("h3", {}, title), h("p", {}, text));
 
   /* ── controller ── */
   function setNavActive(v) { $$(".nav__item").forEach((b) => b.classList.toggle("is-active", b.dataset.view === v)); }

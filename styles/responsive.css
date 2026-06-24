@@ -31,14 +31,17 @@
   .view { padding: 0 var(--s4) var(--s7); }
 }
 
-/* tablet player bar */
+/* tablet / phone player bar: seek becomes a touch strip across the top */
 @media (max-width: 820px) {
-  :root { --player-h: 78px; }
-  .playerbar { grid-template-columns: 1fr auto; gap: var(--s3); padding: 0 var(--s4); }
-  .pb__center {
-    position: static; order: 0;
+  :root { --player-h: 96px; }
+  .playerbar { grid-template-columns: 1fr auto; gap: var(--s3); padding: 22px var(--s4) 0; align-items: center; }
+  .pb__center { position: static; order: 0; }
+  .pb__seek {
+    display: flex; position: absolute; top: 8px; left: 12px; right: 12px;
+    max-width: none; gap: 8px;
   }
-  .pb__seek { display: none; }            /* full seek lives in Now Playing */
+  .pb__seek .pb__time { font-size: 10px; min-width: 2.6ch; }
+  .pb__wave { height: 22px; }
   .pb__right { display: none; }
   .pb__track { order: -1; }
 }

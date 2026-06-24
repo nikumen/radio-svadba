@@ -34,10 +34,10 @@
       </div>
 
       <nav class="nav" aria-label="Разделы">
-        <button class="nav__item is-active" data-view="home" type="button"><span class="nav__ico">⌂</span>Главная</button>
-        <button class="nav__item" data-view="wave" type="button"><span class="nav__ico">≈</span>Моя волна</button>
-        <button class="nav__item" data-view="playlists" type="button"><span class="nav__ico">≣</span>Плейлисты</button>
-        <button class="nav__item" data-view="liked" type="button"><span class="nav__ico">♥</span>Любимое</button>
+        <button class="nav__item is-active" data-view="home" type="button"><span class="nav__ico" data-icon="home" aria-hidden="true"></span>Главная</button>
+        <button class="nav__item" data-view="wave" type="button"><span class="nav__ico" data-icon="wave" aria-hidden="true"></span>Моя волна</button>
+        <button class="nav__item" data-view="playlists" type="button"><span class="nav__ico" data-icon="library" aria-hidden="true"></span>Плейлисты</button>
+        <button class="nav__item" data-view="liked" type="button"><span class="nav__ico" data-icon="heart" aria-hidden="true"></span>Любимое</button>
       </nav>
 
       <div class="sidebar__section">
@@ -46,7 +46,7 @@
       </div>
 
       <div class="sidebar__foot">
-        <span class="globe" aria-hidden="true">🌍</span>
+        <span class="globe" aria-hidden="true" data-icon="globe"></span>
         <span>Работает везде<br>без VPN</span>
       </div>
     </aside>
@@ -55,14 +55,14 @@
     <!-- ░░ MAIN ░░ -->
     <main class="main">
       <header class="topbar">
-        <button class="icon-btn topbar__menu" id="btn-menu" type="button" aria-label="Меню">☰</button>
+        <button class="icon-btn topbar__menu" id="btn-menu" type="button" aria-label="Меню" data-icon="menu"></button>
         <div class="search">
-          <span class="search__ico" aria-hidden="true">⌕</span>
+          <span class="search__ico" aria-hidden="true" data-icon="search"></span>
           <input id="search" type="search" placeholder="Поиск трека или исполнителя…" aria-label="Поиск" autocomplete="off" />
         </div>
         <div class="topbar__actions">
-          <button class="ghost-btn" id="btn-add" type="button">+ Трек по ссылке</button>
-          <button class="icon-btn" id="btn-theme" type="button" aria-label="Сменить тему" title="Тема">◐</button>
+          <button class="ghost-btn" id="btn-add" type="button"><span class="ghost-ico" data-icon="plus" aria-hidden="true"></span>Трек по ссылке</button>
+          <button class="icon-btn" id="btn-theme" type="button" aria-label="Сменить тему" title="Тема" data-icon="theme"></button>
         </div>
       </header>
 
@@ -73,7 +73,7 @@
     <aside class="queue" id="queue" aria-label="Очередь" hidden>
       <div class="queue__head">
         <h2>Очередь</h2>
-        <button class="icon-btn" id="queue-close" type="button" aria-label="Закрыть очередь">×</button>
+        <button class="icon-btn" id="queue-close" type="button" aria-label="Закрыть очередь" data-icon="close"></button>
       </div>
       <ol class="queue__list" id="queue-list"></ol>
     </aside>
@@ -82,21 +82,21 @@
   <!-- ░░ PLAYER BAR ░░ -->
   <footer class="playerbar" id="playerbar" aria-label="Плеер">
     <div class="pb__track">
-      <button class="pb__art" id="pb-art" type="button" aria-label="Развернуть плеер" title="Развернуть"></button>
+      <button class="pb__art" id="pb-art" type="button" aria-label="Развернуть плеер" title="Развернуть"><span class="pb__art-ico" data-icon="maximize" aria-hidden="true"></span></button>
       <div class="pb__meta">
         <span class="pb__title" id="pb-title">Готов к воспроизведению</span>
         <span class="pb__artist" id="pb-artist">Выберите трек</span>
       </div>
-      <button class="iconbtn pb__like" id="pb-like" type="button" aria-label="В любимые" aria-pressed="false">♥</button>
+      <button class="iconbtn pb__like" id="pb-like" type="button" aria-label="В любимые" aria-pressed="false" data-icon="heart"></button>
     </div>
 
     <div class="pb__center">
       <div class="pb__controls">
-        <button class="iconbtn" id="pb-shuffle" type="button" aria-label="Перемешать" aria-pressed="false">⤮</button>
-        <button class="iconbtn" id="pb-prev" type="button" aria-label="Предыдущий">⏮</button>
-        <button class="iconbtn pb__play" id="pb-play" type="button" aria-label="Воспроизвести">▶</button>
-        <button class="iconbtn" id="pb-next" type="button" aria-label="Следующий">⏭</button>
-        <button class="iconbtn" id="pb-repeat" type="button" aria-label="Повтор" data-mode="off">↻</button>
+        <button class="iconbtn" id="pb-shuffle" type="button" aria-label="Перемешать" aria-pressed="false" data-icon="shuffle"></button>
+        <button class="iconbtn" id="pb-prev" type="button" aria-label="Предыдущий" data-icon="prev"></button>
+        <button class="iconbtn pb__play" id="pb-play" type="button" aria-label="Воспроизвести" data-icon="play"></button>
+        <button class="iconbtn" id="pb-next" type="button" aria-label="Следующий" data-icon="next"></button>
+        <button class="iconbtn" id="pb-repeat" type="button" aria-label="Повтор" data-mode="off" data-icon="repeat"></button>
       </div>
       <div class="pb__seek">
         <span class="pb__time" id="pb-cur">0:00</span>
@@ -108,19 +108,19 @@
     </div>
 
     <div class="pb__right">
-      <button class="iconbtn" id="pb-output" type="button" aria-label="Устройство вывода / Bluetooth" title="Bluetooth / устройство вывода">🎧<span class="pb__output-dot" id="pb-output-dot" hidden></span></button>
+      <button class="iconbtn" id="pb-output" type="button" aria-label="Устройство вывода / Bluetooth" title="Bluetooth / устройство вывода"><span data-icon="bluetooth" aria-hidden="true"></span><span class="pb__output-dot" id="pb-output-dot" hidden></span></button>
       <div class="pb__vol">
-        <button class="iconbtn" id="pb-mute" type="button" aria-label="Звук">🔊</button>
+        <button class="iconbtn" id="pb-mute" type="button" aria-label="Звук" data-icon="volHigh"></button>
         <input id="pb-vol" type="range" min="0" max="1" step="0.01" value="1" aria-label="Громкость" />
       </div>
-      <button class="iconbtn" id="pb-share" type="button" aria-label="Поделиться плейлистом" title="Поделиться">↗</button>
-      <button class="iconbtn" id="pb-queue" type="button" aria-label="Очередь" aria-pressed="false">≣</button>
+      <button class="iconbtn" id="pb-share" type="button" aria-label="Поделиться плейлистом" title="Поделиться" data-icon="share"></button>
+      <button class="iconbtn" id="pb-queue" type="button" aria-label="Очередь" aria-pressed="false" data-icon="queue"></button>
     </div>
   </footer>
 
   <!-- ░░ NOW PLAYING (expanded) ░░ -->
   <div class="np" id="np" hidden aria-label="Сейчас играет">
-    <button class="icon-btn np__close" id="np-close" type="button" aria-label="Свернуть">⌄</button>
+    <button class="icon-btn np__close" id="np-close" type="button" aria-label="Свернуть" data-icon="chevronDown"></button>
     <div class="np__art" id="np-art"></div>
     <div class="np__info">
       <p class="np__from" id="np-from">VOLNA</p>
@@ -132,11 +132,11 @@
     </div>
     <div class="np__time"><span id="np-cur">0:00</span><span id="np-dur">0:00</span></div>
     <div class="np__controls">
-      <button class="iconbtn" id="np-shuffle" type="button" aria-label="Перемешать">⤮</button>
-      <button class="iconbtn" id="np-prev" type="button" aria-label="Предыдущий">⏮</button>
-      <button class="iconbtn np__play" id="np-play" type="button" aria-label="Воспроизвести">▶</button>
-      <button class="iconbtn" id="np-next" type="button" aria-label="Следующий">⏭</button>
-      <button class="iconbtn" id="np-repeat" type="button" aria-label="Повтор" data-mode="off">↻</button>
+      <button class="iconbtn" id="np-shuffle" type="button" aria-label="Перемешать" data-icon="shuffle"></button>
+      <button class="iconbtn" id="np-prev" type="button" aria-label="Предыдущий" data-icon="prev"></button>
+      <button class="iconbtn np__play" id="np-play" type="button" aria-label="Воспроизвести" data-icon="play"></button>
+      <button class="iconbtn" id="np-next" type="button" aria-label="Следующий" data-icon="next"></button>
+      <button class="iconbtn" id="np-repeat" type="button" aria-label="Повтор" data-mode="off" data-icon="repeat"></button>
     </div>
   </div>
 

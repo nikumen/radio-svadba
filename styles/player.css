@@ -28,8 +28,9 @@
   transition: transform var(--dur-fast) var(--ease);
 }
 .pb__art:hover { transform: scale(1.04); }
-.pb__art::after { content: "⤢"; position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 1.2rem; background: #0005; opacity: 0; transition: opacity var(--dur-fast); }
-.pb__art:hover::after { opacity: 1; }
+.pb__art-ico { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; background: #0005; opacity: 0; transition: opacity var(--dur-fast); }
+.pb__art:hover .pb__art-ico { opacity: 1; }
+.pb__art-ico svg { width: 20px; height: 20px; }
 .pb__meta { min-width: 0; display: flex; flex-direction: column; }
 .pb__title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pb__artist { font-size: var(--t-sm); color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -39,13 +40,11 @@
 .pb__center { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
 .pb__controls { display: flex; align-items: center; gap: 0.25rem; }
 .pb__play {
-  width: 46px; height: 46px; background: var(--text); color: var(--bg); font-size: 1rem;
+  width: 46px; height: 46px; background: var(--text); color: var(--bg);
   box-shadow: var(--shadow-sm);
 }
+.pb__play svg { width: 22px; height: 22px; }
 .pb__play:hover { background: var(--accent); color: #fff; transform: scale(1.06); }
-.pb__repeat[data-mode="one"]::after {
-  content: "1"; position: absolute; top: 4px; right: 6px; font-size: 0.5rem; font-weight: 800; color: var(--accent-strong);
-}
 .pb__repeat[data-mode="one"], .pb__repeat[data-mode="all"] { color: var(--accent-strong); }
 
 .pb__seek { display: flex; align-items: center; gap: 0.6rem; width: 100%; max-width: 540px; }
@@ -90,6 +89,9 @@ input[type="range"]::-moz-range-thumb { width: 13px; height: 13px; border: 0; bo
 .np__controls .iconbtn:hover { background: #ffffff22; }
 .np__controls .np__play { width: 68px; height: 68px; background: #fff; color: #1a1208; font-size: 1.5rem; }
 .np__controls .np__play:hover { background: #fff; color: #1a1208; transform: scale(1.06); }
+.np__controls .iconbtn svg { width: 26px; height: 26px; }
+.np__controls .np__play svg { width: 30px; height: 30px; }
+.np__close svg { width: 22px; height: 22px; }
 .np__controls .pb__repeat[data-mode="one"], .np__controls .pb__repeat[data-mode="all"] { color: #fff; }
 
 /* ░ TOASTS ░ */

@@ -1,5 +1,6 @@
 // Queue drawer — shows the upcoming play order, click to jump, × to remove.
 import { h, $, $$, artworkCss } from "../lib/util.js";
+import { ICONS } from "../lib/icons.js";
 
 export function initQueue(player) {
   const app = document.querySelector(".app");
@@ -37,10 +38,10 @@ export function initQueue(player) {
             h("div", { class: "qrow__t" }, t.title),
             h("div", { class: "qrow__a" }, t.artist)),
           h("button", {
-            class: "iconbtn", style: { width: "30px", height: "30px", fontSize: "1rem" },
-            "aria-label": "Убрать из очереди", title: "Убрать",
+            class: "iconbtn", style: { width: "30px", height: "30px" },
+            "aria-label": "Убрать из очереди", title: "Убрать", html: ICONS.close,
             onclick: (e) => { e.stopPropagation(); player.removeAt(qi); },
-          }, "×"))
+          }))
       );
       list.append(row);
     });

@@ -9,6 +9,7 @@ import { initShare, parseShareLink } from "./share/share.js";
 import { TRACKS, waveBatch } from "./data/catalog.js";
 import { toast } from "./ui/toast.js";
 import { $, $$, h, store, hashStr } from "./lib/util.js";
+import { renderIcons } from "./lib/icons.js";
 
 /* central play() — fed to the views */
 function play(tracks, index = 0, name = "", { wave = false } = {}) {
@@ -18,6 +19,7 @@ function play(tracks, index = 0, name = "", { wave = false } = {}) {
   player.setQueue(tracks, index, { play: true, name });
 }
 
+renderIcons(document);
 bindMediaSession(player);
 initPlayerBar(player);
 initQueue(player);

@@ -3,11 +3,13 @@ import { createWaveform } from "./waveform.js";
 import { toast } from "./toast.js";
 import { $, fmtTime, artworkCss, artHue } from "../lib/util.js";
 import { likes } from "../lib/likes.js";
+import { setIcon } from "../lib/icons.js";
 
 export function initPlayerBar(player) {
   const seekTo = (f) => player.seek(f * (player.audio.duration || 0));
-  const pbWave = createWaveform($("pb-wave"), { onSeek: seekTo });
-  const npWave = createWaveform($("np-wave"), { onSeek: seekTo });
+  const scrub = (f) => { const t = fmtTime(f * (player.audio.duration || 0)); $("pb-cur").textContent = t; $("np-cur").textContent = t; };
+  const pbWave = createWaveform($("pb-wave"), { onSeek: seekTo, onScrub: scrub });
+  const npWave = createWaveform($("np-wave"), { onSeek: seekTo, onScrub: scrub });
   const np = $("np");
 
   const playBtns = [$("pb-play"), $("np-play")];
@@ -30,6 +32,7 @@ export function initPlayerBar(player) {
     const b = $("pb-like");
     b.classList.toggle("is-liked", liked);
     b.setAttribute("aria-pressed", String(liked));
+    setIcon(b, liked ? "heartFilled" : "heart");
   };
   $("pb-like").addEventListener("click", () => { const t = player.current(); if (t) likeUI(t, likes.toggle(t.id)); });
   likes.onChange((id, on) => { const t = player.current(); if (t && t.id === id) likeUI(t, on); });
@@ -40,7 +43,7 @@ export function initPlayerBar(player) {
   $("pb-mute").addEventListener("click", () => player.toggleMute());
   player.addEventListener("volume", () => {
     vol.value = player.audio.volume;
-    $("pb-mute").textContent = player.audio.volume === 0 ? "🔇" : player.audio.volume < 0.5 ? "🔉" : "🔊";
+    setIcon($("pb-mute"), player.audio.volume === 0 ? "volMute" : player.audio.volume < 0.5 ? "volLow" : "volHigh");
   });
   vol.value = player.audio.volume;
 
@@ -54,12 +57,12 @@ export function initPlayerBar(player) {
 
   function renderState() {
     const p = player.isPlaying;
-    groups.play.forEach((b) => { b.textContent = p ? "⏸" : "▶"; b.setAttribute("aria-label", p ? "Пауза" : "Воспроизвести"); });
+    groups.play.forEach((b) => { setIcon(b, p ? "pause" : "play"); b.setAttribute("aria-label", p ? "Пауза" : "Воспроизвести"); });
     document.body.classList.toggle("is-paused", !p);
   }
   function renderModes() {
     groups.shuffle.forEach((b) => { b.classList.toggle("is-on", player.shuffle); b.setAttribute("aria-pressed", String(player.shuffle)); });
-    groups.repeat.forEach((b) => { b.setAttribute("data-mode", player.repeat); b.setAttribute("aria-label", player.repeat === "one" ? "Повтор одного" : player.repeat === "all" ? "Повтор всех" : "Повтор"); });
+    groups.repeat.forEach((b) => { setIcon(b, player.repeat === "one" ? "repeatOne" : "repeat"); b.setAttribute("data-mode", player.repeat); b.setAttribute("aria-label", player.repeat === "one" ? "Повтор одного" : player.repeat === "all" ? "Повтор всех" : "Повтор"); });
   }
 
   let errStreak = 0;
