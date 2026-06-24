@@ -34,8 +34,12 @@
 .cover-logo {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
   width: 68%; height: auto; pointer-events: none;
-  filter: brightness(0) invert(1) drop-shadow(0 1px 2px rgba(20, 12, 8, 0.5));
-  opacity: 0.97;
+  /* чёрный логотип + белая обводка по 8 направлениям → читается на любом фоне */
+  filter: brightness(0)
+    drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff)
+    drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff)
+    drop-shadow(1px 1px 0 #fff) drop-shadow(-1px -1px 0 #fff)
+    drop-shadow(1px -1px 0 #fff) drop-shadow(-1px 1px 0 #fff);
 }
 
 .pill-btn {
