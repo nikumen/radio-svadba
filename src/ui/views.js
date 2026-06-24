@@ -1,5 +1,5 @@
-// VOLNA views: home, playlists, playlist detail, liked, search.
-import { TRACKS, PLAYLISTS, getTrack, getPlaylist, playlistTracks, waveBatch } from "../data/catalog.js";
+// VOLNA views — сайт посвящён единственному плейлисту РАДИО СВАДЬБА.
+import { WEDDING, PLAYLISTS, getTrack, getPlaylist, playlistTracks } from "../data/catalog.js";
 import { h, $, $$, fmtTime, artworkCss, genWaveform, applyCover } from "../lib/util.js";
 import { likes } from "../lib/likes.js";
 import { shareUrl, playlistShareUrl } from "../share/share.js";
@@ -49,12 +49,12 @@ export function mountViews(player, { play }) {
     return b;
   }
 
-  function trackRow(track, idx, tracks, name, wave) {
+  function trackRow(track, idx, tracks, name) {
     return h("div", {
       class: "trow", role: "button", tabindex: "0",
       dataset: { trackId: track.id }, style: { "--i": idx },
-      onclick: () => play(tracks, idx, name, { wave }),
-      onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); play(tracks, idx, name, { wave }); } },
+      onclick: () => play(tracks, idx, name),
+      onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); play(tracks, idx, name); } },
     },
       h("span", { class: "trow__idx" },
         h("span", { class: "num" }, String(idx + 1)),
@@ -71,8 +71,8 @@ export function mountViews(player, { play }) {
     );
   }
 
-  const tracklist = (tracks, name, wave = false) =>
-    h("div", { class: "tracklist" }, ...tracks.map((t, i) => trackRow(t, i, tracks, name, wave)));
+  const tracklist = (tracks, name) =>
+    h("div", { class: "tracklist" }, ...tracks.map((t, i) => trackRow(t, i, tracks, name)));
 
   function section(title, content, more) {
     return h("section", { class: "section" },
@@ -90,7 +90,7 @@ export function mountViews(player, { play }) {
       h("div", { class: "pcard__art", style: { background: artworkCss(pl.id) } },
         h("button", {
           class: "pcard__play", type: "button", "aria-label": "Слушать " + pl.title, html: ICONS.play,
-          onclick: (e) => { e.stopPropagation(); play(pl.wave ? waveBatch(12) : tracks, 0, pl.title, { wave: !!pl.wave }); },
+          onclick: (e) => { e.stopPropagation(); play(tracks, 0, pl.title); },
         })),
       h("div", {},
         h("div", { class: "pcard__title" }, pl.title),
@@ -99,34 +99,17 @@ export function mountViews(player, { play }) {
   }
 
   /* ── views ── */
-  function viewHome() {
-    const frag = h("div", {});
-    frag.append(
-      h("section", { class: "hero" },
-        h("div", { class: "hero__bars", "aria-hidden": "true" },
-          ...Array.from({ length: 7 }, () => h("span", { style: { animationDelay: (Math.random() * -1.4).toFixed(2) + "s" } }))),
-        h("p", { class: "hero__eyebrow" }, "Моя волна"),
-        h("h1", { class: "hero__title" }, "Бесконечный поток"),
-        h("p", { class: "hero__sub" }, "Персональная волна, которая играет без остановки. Доступно отовсюду — без VPN, без аккаунта."),
-        h("div", { class: "hero__actions" },
-          h("button", { class: "pill-btn", type: "button", onclick: () => play(waveBatch(12), 0, "Моя волна", { wave: true }) }, "▶  Слушать волну"),
-          h("button", { class: "pill-btn pill-btn--ghost", type: "button", onclick: () => $("pb-share").click() }, "↗  Поделиться"))
-      ),
-      section("Плейлисты", h("div", { class: "rail" }, ...PLAYLISTS.map(plCard))),
-      section("Все треки", tracklist(TRACKS, "Все треки"), `${TRACKS.length} треков`)
-    );
-    return frag;
-  }
+  function viewHome() { return viewPlaylist("wedding"); } // единственный плейлист = главная
 
   function viewPlaylists() {
-    return h("div", {}, section("Все плейлисты",
+    return h("div", {}, section("Плейлисты",
       h("div", { style: { display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fill, minmax(168px, 1fr))" } },
         ...PLAYLISTS.map(plCard))));
   }
 
   function viewPlaylist(id) {
     const pl = getPlaylist(id);
-    if (!pl) return viewHome();
+    if (!pl) return emptyState("search", "Плейлист не найден", "");
     const tracks = playlistTracks(id);
     return h("div", {},
       h("div", { class: "section", style: { display: "flex", gap: "1.25rem", alignItems: "flex-end", flexWrap: "wrap" } },
@@ -134,11 +117,11 @@ export function mountViews(player, { play }) {
         h("div", {},
           h("p", { class: "hero__eyebrow", style: { color: "var(--text-3)" } }, "Плейлист"),
           h("h1", { style: { fontSize: "var(--t-xl)" } }, pl.title),
-          h("p", { style: { color: "var(--text-2)" } }, `${pl.subtitle} · ${tracks.length} треков`),
+          h("p", { style: { color: "var(--text-2)" } }, `${pl.subtitle} · ${tracks.length} ${tracks.length === 1 ? "трек" : "трека"}`),
           h("div", { class: "hero__actions", style: { marginTop: "1rem" } },
-            h("button", { class: "pill-btn", type: "button", onclick: () => play(pl.wave ? waveBatch(12) : tracks, 0, pl.title, { wave: !!pl.wave }) }, "▶  Слушать"),
-            h("button", { class: "pill-btn pill-btn--ghost", type: "button", onclick: () => shareUrl(playlistShareUrl(id), pl.title) }, "↗  Поделиться")))),
-      h("div", { class: "section" }, tracklist(tracks, pl.title, !!pl.wave))
+            h("button", { class: "pill-btn", type: "button", html: ICONS.play + "<span>Слушать</span>", onclick: () => play(tracks, 0, pl.title) }),
+            h("button", { class: "pill-btn pill-btn--ghost", type: "button", html: ICONS.share + "<span>Поделиться</span>", onclick: () => shareUrl(playlistShareUrl(id), pl.title) })))),
+      h("div", { class: "section" }, tracklist(tracks, pl.title))
     );
   }
 
@@ -149,25 +132,9 @@ export function mountViews(player, { play }) {
     return h("div", {}, section("Любимое", tracklist(tracks, "Любимое"), `${tracks.length}`));
   }
 
-  function viewWave() {
-    const frag = h("div", {});
-    frag.append(
-      h("section", { class: "hero" },
-        h("div", { class: "hero__bars", "aria-hidden": "true" },
-          ...Array.from({ length: 7 }, () => h("span", { style: { animationDelay: (Math.random() * -1.4).toFixed(2) + "s" } }))),
-        h("p", { class: "hero__eyebrow" }, "Моя волна"),
-        h("h1", { class: "hero__title" }, "Бесконечный поток"),
-        h("p", { class: "hero__sub" }, "Запустите волну — треки будут добавляться сами, пока вы слушаете."),
-        h("div", { class: "hero__actions" },
-          h("button", { class: "pill-btn", type: "button", onclick: () => play(waveBatch(12), 0, "Моя волна", { wave: true }) }, "▶  Запустить волну"))),
-      section("В потоке", tracklist(TRACKS, "Моя волна", true))
-    );
-    return frag;
-  }
-
   function viewSearch(q) {
     const lq = q.toLowerCase();
-    const res = TRACKS.filter((t) => t.title.toLowerCase().includes(lq) || t.artist.toLowerCase().includes(lq));
+    const res = WEDDING.filter((t) => t.title.toLowerCase().includes(lq) || t.artist.toLowerCase().includes(lq));
     if (!res.length) return emptyState("search", "Ничего не нашлось", `По запросу «${q}» нет треков. Можно добавить трек по ссылке.`);
     return h("div", {}, section(`Результаты: «${q}»`, tracklist(res, "Поиск"), `${res.length}`));
   }
@@ -183,26 +150,15 @@ export function mountViews(player, { play }) {
     if (current === "search") view.append(viewSearch(query));
     else if (current === "playlists") view.append(viewPlaylists());
     else if (current === "liked") view.append(viewLiked());
-    else if (current === "wave") view.append(viewWave());
     else if (current.startsWith("pl:")) view.append(viewPlaylist(current.slice(3)));
     else view.append(viewHome());
     updateCurrent(player.current());
   }
 
-  function show(v) {
-    current = v; query = "";
-    setNavActive(v === "wave" ? "wave" : v);
-    paint(); view.scrollTop = 0;
-  }
-  function openPlaylist(id) {
-    current = "pl:" + id; query = "";
-    setNavActive("playlists"); paint(); view.scrollTop = 0;
-  }
-  function search(q) {
-    query = q.trim();
-    current = query ? "search" : "home";
-    setNavActive("home"); paint();
-  }
+  function show(v) { current = v; query = ""; setNavActive(v); paint(); view.scrollTop = 0; }
+  function openPlaylist(id) { current = "pl:" + id; query = ""; setNavActive("playlists"); paint(); view.scrollTop = 0; }
+  function search(q) { query = q.trim(); current = query ? "search" : "home"; setNavActive("home"); paint(); }
+
   function updateCurrent(track) {
     const id = track && track.id;
     $$(".trow", view).forEach((r) => r.classList.toggle("is-current", r.dataset.trackId === id));
