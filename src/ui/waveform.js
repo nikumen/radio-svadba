@@ -52,28 +52,33 @@ export function createWaveform(canvas, { onSeek, onScrub } = {}) {
     }
   }
 
-  const fracFromEvent = (e) => {
+  const clientXOf = (e) =>
+    e.touches && e.touches[0] ? e.touches[0].clientX
+    : e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX
+    : e.clientX;
+  const fracFrom = (e) => {
     const r = canvas.getBoundingClientRect();
-    return clamp((e.clientX - r.left) / r.width, 0, 1);
+    return clamp((clientXOf(e) - r.left) / r.width, 0, 1);
   };
+  let gesture = false; // dedupe: one finger never seeks twice (pointer + touch both fire)
+  const begin = (e) => { if (gesture) return; gesture = true; dragging = true; hover = fracFrom(e); draw(); onScrub && onScrub(hover); };
+  const moveTo = (e) => { if (!gesture) return; hover = fracFrom(e); onScrub && onScrub(hover); draw(); };
+  const finish = (e) => { if (!gesture) return; gesture = false; dragging = false; onSeek && onSeek(fracFrom(e)); hover = null; draw(); };
+  const cancel = () => { gesture = false; dragging = false; hover = null; draw(); };
 
-  wrap.addEventListener("pointerdown", (e) => {
-    dragging = true;
-    try { wrap.setPointerCapture(e.pointerId); } catch {}
-    hover = fracFromEvent(e); draw();
-    onScrub && onScrub(hover);
-  });
-  wrap.addEventListener("pointermove", (e) => {
-    hover = fracFromEvent(e);
-    if (dragging) onScrub && onScrub(hover);
-    draw();
-  });
-  wrap.addEventListener("pointerup", (e) => {
-    if (dragging) { dragging = false; onSeek && onSeek(fracFromEvent(e)); }
-    hover = null; draw();
-  });
-  wrap.addEventListener("pointercancel", () => { dragging = false; hover = null; draw(); });
+  // Pointer (mouse / pen / touch) — primary path on every modern browser.
+  wrap.addEventListener("pointerdown", (e) => { try { wrap.setPointerCapture(e.pointerId); } catch {} begin(e); });
+  wrap.addEventListener("pointermove", moveTo);
+  wrap.addEventListener("pointerup", finish);
+  wrap.addEventListener("pointercancel", cancel);
   wrap.addEventListener("pointerleave", () => { if (!dragging) { hover = null; draw(); } });
+
+  // Touch — explicit fallback for devices where pointer events misbehave; the
+  // `gesture` guard keeps it from double-seeking when both fire for one finger.
+  wrap.addEventListener("touchstart", (e) => { e.preventDefault(); begin(e); }, { passive: false });
+  wrap.addEventListener("touchmove", (e) => { e.preventDefault(); moveTo(e); }, { passive: false });
+  wrap.addEventListener("touchend", (e) => { e.preventDefault(); finish(e); }, { passive: false });
+  wrap.addEventListener("touchcancel", cancel);
   wrap.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") { onSeek && onSeek(clamp(progress + 0.02, 0, 1)); e.preventDefault(); }
     if (e.key === "ArrowLeft")  { onSeek && onSeek(clamp(progress - 0.02, 0, 1)); e.preventDefault(); }
